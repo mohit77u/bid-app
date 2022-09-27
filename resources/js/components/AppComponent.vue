@@ -174,7 +174,7 @@ export default {
                     console.log(res)
 
                 })
-            Object.assign(this.$data, this.$options.data())
+            
         },
         Cancel() {
             this.popup = false
