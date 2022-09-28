@@ -13,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('current_games', function (Blueprint $table) {
             $table->id();
-            $table->string('period_id');
-            $table->id('user_id');
-            $table->string('type');
-            $table->string('value');
-            $table->int('result')->default(0);
+            $table->string('period');
+            $table->string('expire_time');
+            $table->string('status')->default(0);
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('current_games');
     }
 };

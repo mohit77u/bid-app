@@ -8,9 +8,9 @@
 // @import 'bootstrap/scss/bootstrap';
 @import 'mdb-ui-kit/css/mdb.min.css';
 
-$green: #008744;
+$green: rgb(20, 164, 77);
 $blue: #0057e7;
-$red: #d62d20;
+$red: rgb(220, 76, 100);
 $yellow: #ffa700;
 $white: #eee;
 
@@ -235,6 +235,51 @@ $width: 100px;
                     }
                 }
             }
+        }
+    }
+
+    .results{
+        table{
+            td,th{
+                text-align: center;
+            }
+            .color{
+                margin: auto;
+            }
+            .green{
+                .number{
+                    color: $green;
+                }
+                .color{
+                    width: 25px;
+                    height: 25px;
+                    border-radius: 50%;
+                    background: $green;
+                }
+            }
+            .red{
+                .number{
+                    color: $red;
+                }
+                .color{
+                    width: 25px;
+                    height: 25px;
+                    border-radius: 50%;
+                    background: $red;
+                }
+            }
+            .voilet{
+                .number{
+                    color: purple;
+                }
+                .color{
+                    width: 25px;
+                    height: 25px;
+                    border-radius: 50%;
+                    background: purple;
+                }
+            }
+            
         }
     }
 }

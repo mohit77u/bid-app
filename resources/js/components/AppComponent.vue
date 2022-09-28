@@ -70,8 +70,8 @@
                         <tr v-for="(result,index) in results" :key="index">
                             <th scope="row">{{index + 1}}</th>
                             <td>{{ result.period}}</td>
-                            <td>{{ result.result_number}}</td>
-                            <td>{{ result.result_color}}</td>
+                            <td :class="result.result_color"><p class="number">{{ result.result_number}}</p></td>
+                            <td :class="result.result_color"><div class="color"></div></td>
                         </tr>
                     </tbody>
                 </table>

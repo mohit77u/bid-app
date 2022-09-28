@@ -60,9 +60,78 @@ class ResultController extends Controller
             $result['result_color'] = 'green';
         }
 
+        // for number reults
+        if($result['result_color'] == 'green')
+        {
+            $zeroColorCount = Order::where('value', '0')->sum('amount');
+            $oneColorCount = Order::where('value', '1')->sum('amount');
+            $fiveColorCount = Order::where('value', '5')->sum('amount');
+            $eightColorCount = Order::where('value', '8')->sum('amount');
+
+            $greenNumberResultMin = min($oneColorCount, $fiveColorCount, $eightColorCount);
+
+            if($greenNumberResultMin == $oneColorCount)
+            {
+                $result['result_number'] = '1';
+            }
+            elseif($greenNumberResultMin == $fiveColorCount)
+            {
+                $result['result_number'] = '5';
+            }
+            elseif($greenNumberResultMin == $zeroColorCount)
+            {
+                $result['result_number'] = '0';
+            }
+            elseif($greenNumberResultMin == $eightColorCount)
+            {
+                $result['result_number'] = '8';
+            }
+        }
+        elseif($result['result_color'] == 'red')
+        {
+            $twoColorCount = Order::where('value', '2')->sum('amount');
+            $fourColorCount = Order::where('value', '4')->sum('amount');
+            $sevenColorCount = Order::where('value', '7')->sum('amount');
+
+            $greenNumberResultMin = min($twoColorCount, $fourColorCount, $sevenColorCount);
+
+            if($greenNumberResultMin == $twoColorCount)
+            {
+                $result['result_number'] = '2';
+            }
+            elseif($greenNumberResultMin == $fourColorCount)
+            {
+                $result['result_number'] = '4';
+            }
+            elseif($greenNumberResultMin == $sevenColorCount)
+            {
+                $result['result_number'] = '7';
+            }
+        }
+        elseif($result['result_color'] == 'voilet')
+        {
+            $twoColorCount = Order::where('value', '3')->sum('amount');
+            $fourColorCount = Order::where('value', '6')->sum('amount');
+            $sevenColorCount = Order::where('value', '9')->sum('amount');
+
+            $greenNumberResultMin = min($twoColorCount, $fourColorCount, $sevenColorCount);
+
+            if($greenNumberResultMin == $twoColorCount)
+            {
+                $result['result_number'] = '2';
+            }
+            elseif($greenNumberResultMin == $fourColorCount)
+            {
+                $result['result_number'] = '4';
+            }
+            elseif($greenNumberResultMin == $sevenColorCount)
+            {
+                $result['result_number'] = '7';
+            }
+        }
+
         $latesResult = Result::latest('created_at')->first();
         $result['period'] = $latesResult->period + 1;
-        $result['result_number'] = '2';
 
         // store in db
         Result::create($result);
