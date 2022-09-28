@@ -163,16 +163,16 @@ export default {
         },
         async SubmitBidData() {
             this.popup = false
-            const data = {
+            const order = {
                 type: this.type,
                 value: this.value,
                 amount: this.totalAmount,
+                period: this.period,
             }
-            console.log(data)
-            await axios.post('/order-create', data)
+            console.log(order)
+            await axios.post('/order-create', order)
                 .then(res => {
                     console.log(res)
-
                 })
             
         },

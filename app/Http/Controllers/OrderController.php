@@ -36,14 +36,14 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $order = $request->validate([
-            // 'period'  => 'required',
+            'period'  => 'required',
             // 'user_id'  => 'required',
             'type'  => 'required',
             'value'  => 'required',
             'amount'  => 'required',
         ]);
 
-        $order['period']    = '20000';
+        // $order['period']    = '20000';
         $order['user_id']   = '1';
 
         Order::create($order);

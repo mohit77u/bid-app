@@ -44,7 +44,9 @@ class ResultController extends Controller
         $redColorCount = Order::where('value', 'red')->sum('amount');
         $voiletColorCount = Order::where('value', 'voilet')->sum('amount');
 
+        // get min of color sum
         $colorResultMin = min($greenColorCount, $redColorCount, $voiletColorCount);
+
         if($colorResultMin == $voiletColorCount)
         {
             $result['result_color'] = 'voilet';
@@ -62,7 +64,7 @@ class ResultController extends Controller
         $result['period'] = $latesResult->period + 1;
         $result['result_number'] = '2';
 
-        // dd($result);
+        // store in db
         Result::create($result);
 
         return response([
