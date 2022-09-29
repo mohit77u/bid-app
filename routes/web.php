@@ -27,4 +27,5 @@ Route::controller(OrderController::class)->group(function(){
 Route::controller(ResultController::class)->group(function(){
     Route::get('/results', 'index');
     Route::post('/results', 'store');
+    Route::get('/current-game', 'getCurrentGame');
 });

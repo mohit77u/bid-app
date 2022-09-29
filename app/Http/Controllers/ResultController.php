@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CurrentGame;
 use App\Models\Order;
 use App\Models\Result;
 use Illuminate\Http\Request;
@@ -40,9 +41,13 @@ class ResultController extends Controller
      */
     public function store(Request $request)
     {
-        $greenColorCount = Order::where('value', 'green')->sum('amount');
-        $redColorCount = Order::where('value', 'red')->sum('amount');
-        $voiletColorCount = Order::where('value', 'voilet')->sum('amount');
+        $latesResult = Result::latest('created_at')->first();
+
+        CurrentGame::query()->delete();
+
+        $greenColorCount = Order::where('period', $latesResult->period)->where('value', 'green')->sum('amount');
+        $redColorCount = Order::where('period', $latesResult->period)->where('value', 'red')->sum('amount');
+        $voiletColorCount = Order::where('period', $latesResult->period)->where('value', 'voilet')->sum('amount');
 
         // get min of color sum
         $colorResultMin = min($greenColorCount, $redColorCount, $voiletColorCount);
@@ -63,10 +68,10 @@ class ResultController extends Controller
         // for number reults
         if($result['result_color'] == 'green')
         {
-            $zeroColorCount = Order::where('value', '0')->sum('amount');
-            $oneColorCount = Order::where('value', '1')->sum('amount');
-            $fiveColorCount = Order::where('value', '5')->sum('amount');
-            $eightColorCount = Order::where('value', '8')->sum('amount');
+            $zeroColorCount = Order::where('period', $latesResult->period)->where('value', '0')->sum('amount');
+            $oneColorCount = Order::where('period', $latesResult->period)->where('value', '1')->sum('amount');
+            $fiveColorCount = Order::where('period', $latesResult->period)->where('value', '5')->sum('amount');
+            $eightColorCount = Order::where('period', $latesResult->period)->where('value', '8')->sum('amount');
 
             $greenNumberResultMin = min($oneColorCount, $fiveColorCount, $eightColorCount);
 
@@ -89,9 +94,9 @@ class ResultController extends Controller
         }
         elseif($result['result_color'] == 'red')
         {
-            $twoColorCount = Order::where('value', '2')->sum('amount');
-            $fourColorCount = Order::where('value', '4')->sum('amount');
-            $sevenColorCount = Order::where('value', '7')->sum('amount');
+            $twoColorCount = Order::where('period', $latesResult->period)->where('value', '2')->sum('amount');
+            $fourColorCount = Order::where('period', $latesResult->period)->where('value', '4')->sum('amount');
+            $sevenColorCount = Order::where('period', $latesResult->period)->where('value', '7')->sum('amount');
 
             $greenNumberResultMin = min($twoColorCount, $fourColorCount, $sevenColorCount);
 
@@ -110,35 +115,56 @@ class ResultController extends Controller
         }
         elseif($result['result_color'] == 'voilet')
         {
-            $twoColorCount = Order::where('value', '3')->sum('amount');
-            $fourColorCount = Order::where('value', '6')->sum('amount');
-            $sevenColorCount = Order::where('value', '9')->sum('amount');
+            $threeColorCount = Order::where('period', $latesResult->period)->where('value', '3')->sum('amount');
+            $sixColorCount = Order::where('period', $latesResult->period)->where('value', '6')->sum('amount');
+            $nineColorCount = Order::where('period', $latesResult->period)->where('value', '9')->sum('amount');
 
-            $greenNumberResultMin = min($twoColorCount, $fourColorCount, $sevenColorCount);
+            $greenNumberResultMin = min($threeColorCount, $sixColorCount, $nineColorCount);
 
-            if($greenNumberResultMin == $twoColorCount)
+            if($greenNumberResultMin == $threeColorCount)
             {
-                $result['result_number'] = '2';
+                $result['result_number'] = '3';
             }
-            elseif($greenNumberResultMin == $fourColorCount)
+            elseif($greenNumberResultMin == $sixColorCount)
             {
-                $result['result_number'] = '4';
+                $result['result_number'] = '6';
             }
-            elseif($greenNumberResultMin == $sevenColorCount)
+            elseif($greenNumberResultMin == $nineColorCount)
             {
-                $result['result_number'] = '7';
+                $result['result_number'] = '9';
             }
         }
 
-        $latesResult = Result::latest('created_at')->first();
         $result['period'] = $latesResult->period + 1;
 
         // store in db
         Result::create($result);
 
+        $currentGame['period'] = $result['period'] + 1;
+        $currentGame['expired_time'] = now()->addMinutes(3);
+
+        $currentGame = CurrentGame::create($currentGame);
+
+        $currentGame->expired_time = date('M d, Y H:i:s', strtotime($currentGame->expired_time));
+        
         return response([
-            'message'   => 'Result Updated Successfully',
-            'data'      => $result,
+            'message'           => 'Result Updated Successfully',
+            'data'              => $result,
+            'current_game'      => $currentGame,
+        ]);
+    }
+
+    // get currentgame functions
+    public function getCurrentGame(Request $request)
+    {
+        $currentGame = CurrentGame::first();
+        // dd($currentGame->expired_time);
+
+        $currentGame->expired_time = date('M d, Y H:i:s', strtotime($currentGame->expired_time));
+
+        return response([
+            'message'           => 'Current game data successfully get',
+            'current_game'      => $currentGame,
         ]);
     }
 

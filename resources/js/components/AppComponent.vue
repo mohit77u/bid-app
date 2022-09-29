@@ -12,7 +12,7 @@
 
             <div class="period-timer">
                 <h3>Period: {{ period }}</h3>
-                <h3>{{ timerCount }}</h3>
+                <h3>{{ remaining.min }} : {{ remaining.seconds }}</h3>
             </div>
 
             <div class="color-group my-4">
@@ -100,7 +100,6 @@ export default {
         return {
             popup: false,
             loading: false,
-            timerCount: 30,
             type: '',
             value: '',
             qty: 1,
@@ -108,32 +107,14 @@ export default {
             totalAmount: 10,
             period: '',
             results: {},
-        }
-    },
-    watch: {
-        timerCount: {
-            handler(value) {
-                if (value > 0) {
-                    setTimeout(() => {
-                        this.timerCount--;
-                    }, 1000);
-                } else if (value === 0) {
-                    this.loading = true
-                    setTimeout(() => {
-                        this.loading = false
-                        this.clearInterval()
-                        this.postResults()
-                        this.getAllResults()
-                    }, 5000)
-                }
+            remaining: {
+                min: '02',
+                seconds: '59',
             },
-            immediate: true // This ensures the watcher is triggered upon creation
+            expiredTime: ''
         }
     },
     methods: {
-        clearInterval() {
-            this.timerCount = 30
-        },
         setOrder(type, value) {
             this.type = type
             this.value = value
@@ -183,27 +164,66 @@ export default {
         postResults() {
             axios.post('/results')
                 .then(res => {
-                    console.log(res.data)
-                    let result = res.data.data
-                    this.period = result.period + 1
+                    let currentGame = res.data.current_game
+                    this.period = currentGame.period
+                    this.expiredTime = currentGame.expired_time
                 })
         },
         getAllResults() {
             axios.get('/results?page=1')
                 .then(res => {
-                    console.log(res.data)
                     let result = res.data.data
-                    console.log(result)
                     this.results = result.data
                     this.period = result.data[0].period + 1
+                    
                 })
+        },
+        updateTimer() {
+            setTimeout(() => {
+                const future = Date.parse(this.expiredTime);
+                var now = new Date();
+                console.log(now)
+                var diff = future - now;
+
+                var hours = Math.floor(diff / (1000 * 60 * 60));
+                var mins = Math.floor(diff / (1000 * 60));
+                var secs = Math.floor(diff / 1000);
+
+                this.remaining.min = '0' + mins - hours * 60;
+                this.remaining.min = '0' + this.remaining.min;
+                if(secs - mins * 60 < 10){
+                    this.remaining.seconds = secs - mins * 60;
+                    this.remaining.seconds = '0' + this.remaining.seconds;
+                } else {
+                    this.remaining.seconds = secs - mins * 60;
+                }
+                this.updateTimer()
+
+                if (this.remaining.min === '00' && this.remaining.seconds === '00') {
+                    this.loading = true
+                    setTimeout(() => {
+                        this.loading = false
+                        this.postResults()
+                        this.getAllResults()
+                    }, 5000)
+                }
+            }, 1000)
+
+        },
+        getCurrentGame(){
+            axios.get('/current-game')
+            .then(res=>{
+                console.log(res.data)
+                let currentGame = res.data.current_game
+                this.period = currentGame.period
+                this.expiredTime = currentGame.expired_time
+            })
         }
     },
     created() {
-        // this.postResults()
-    },
-    beforeMount(){
+        this.updateTimer()
         this.getAllResults()
+        this.getCurrentGame()
     },
 }
 </script>
